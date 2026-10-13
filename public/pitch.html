@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CortexDePIN — Pitch</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='16' height='16' rx='4' fill='%239945FF'/%3E%3Crect x='13' y='13' width='16' height='16' rx='4' fill='%2314F195'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #07080c;
+        --ink: #f4f6f8;
+        --muted: #a7b0c0;
+        --faint: #7d8798;
+        --line: rgba(243, 245, 248, 0.1);
+        --green: #14f195;
+        --green-ink: #06281a;
+        --purple: #9945ff;
+        --panel: #10131a;
+        --sans: "Outfit", "Segoe UI", sans-serif;
+        --mono: "IBM Plex Mono", ui-monospace, monospace;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; background: #05060a; color: var(--ink); font-family: var(--sans); }
+      button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+      p, h1, h2, ul, ol { margin: 0; }
+      .viewport { height: 100%; display: grid; place-items: center; }
+      .frame {
+        width: min(100vw, calc(100vh * 16 / 9));
+        aspect-ratio: 16 / 9;
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(880px 420px at 0% -10%, rgba(153, 69, 255, 0.2), transparent 55%),
+          radial-gradient(720px 380px at 100% 0%, rgba(20, 241, 149, 0.08), transparent 50%),
+          var(--bg);
+      }
+      .top, .bottom {
+        position: absolute;
+        left: 36px;
+        right: 36px;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .top { top: 18px; }
+      .bottom { bottom: 16px; }
+      .brand { display: flex; align-items: center; gap: 8px; font-weight: 650; letter-spacing: -0.04em; font-size: 16px; }
+      .brand svg { width: 22px; height: 22px; display: block; }
+      .brand em {
+        font-style: normal;
+        background: linear-gradient(90deg, var(--purple), var(--green));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .pill { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .slides { position: absolute; inset: 58px 0 52px; }
+      .slide { display: none; height: 100%; padding: 8px 48px 10px; }
+      .slide.on { display: grid; }
+      .slide > *, .pipes > *, .node, .exit, .pane, .step, .facts article, .seat { min-width: 0; }
+      h1, h2, p, em, b { overflow-wrap: break-word; }
+      .kicker { color: var(--green); font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+      h1 { font-weight: 650; letter-spacing: -0.05em; line-height: 0.96; }
+      .lede { color: var(--muted); font-size: 18px; line-height: 1.4; max-width: 44ch; }
+      .idx, .slide-name { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+      .controls { display: flex; gap: 8px; }
+      .controls button {
+        width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--line);
+        display: grid; place-items: center;
+      }
+      .controls button:hover { border-color: rgba(20, 241, 149, 0.6); }
+      .track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; display: flex; gap: 3px; padding: 0 36px 8px; z-index: 3; }
+      .track button { flex: 1; height: 3px; border-radius: 99px; background: rgba(255, 255, 255, 0.12); padding: 0; }
+      .track button.on { background: var(--green); }
+
+      .cover { grid-template-columns: 1.15fr 0.85fr; gap: 32px; align-items: center; }
+      .cover h1 { font-size: clamp(36px, 3.5vw, 54px); max-width: 16em; margin: 12px 0 16px; }
+      .receipt {
+        justify-self: end;
+        width: min(100%, 390px);
+        border-radius: 22px;
+        padding: 20px 20px 16px;
+        background:
+          radial-gradient(280px 120px at 100% 0%, rgba(20, 241, 149, 0.12), transparent 55%),
+          var(--panel);
+        border: 1px solid rgba(20, 241, 149, 0.32);
+        position: relative;
+      }
+      .seal {
+        position: absolute; top: 16px; right: 16px;
+        width: 64px; height: 64px; border-radius: 50%;
+        border: 2px solid var(--green); color: var(--green);
+        display: grid; place-items: center;
+        font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+        transform: rotate(8deg);
+      }
+      .receipt .kicker { margin-bottom: 8px; }
+      .receipt h2 { font-size: 22px; letter-spacing: -0.04em; font-weight: 600; }
+      .receipt .job { color: var(--muted); font-size: 14px; margin: 4px 0 12px; }
+      .receipt strong { display: block; font-size: 42px; letter-spacing: -0.05em; line-height: 1; font-weight: 650; }
+      .receipt strong small { font-size: 14px; color: var(--muted); font-weight: 500; margin-left: 6px; }
+      .receipt dl { margin: 12px 0 0; }
+      .receipt div, .spec div, .ledger div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+      .receipt dt, .spec dt, .ledger dt { color: var(--muted); }
+      .receipt dd, .spec dd, .ledger dd { margin: 0; text-align: right; }
+      .receipt div { padding: 7px 0; border-top: 1px solid var(--line); }
+
+      .gap, .thesis { align-content: center; }
+      .gap h1, .thesis h1 { font-size: clamp(40px, 4.4vw, 64px); max-width: 16ch; margin: 12px 0 16px; }
+      .gap .lede, .thesis p { font-size: 22px; max-width: 36ch; line-height: 1.35; color: #d7dbe3; }
+      .rule { width: 72px; height: 4px; border-radius: 99px; background: linear-gradient(90deg, var(--purple), var(--green)); margin: 18px 0; }
+
+      .breaks { align-content: center; }
+      .breaks h1 { font-size: clamp(32px, 3.2vw, 46px); margin: 8px 0 16px; max-width: 18ch; }
+      .breaks ol { list-style: none; padding: 0; }
+      .breaks li { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); }
+      .breaks li span { font-family: var(--mono); color: var(--green); font-size: 13px; }
+      .breaks b { display: block; font-size: 18px; margin-bottom: 3px; }
+      .breaks p { color: var(--muted); max-width: 70ch; line-height: 1.35; }
+
+      .how, .proof, .solana, .fee, .now { grid-template-rows: auto 1fr; gap: 16px; }
+      .how h1, .proof h1, .solana h1, .fee h1, .now h1, .seats h1, .round h1, .market h1 {
+        font-size: clamp(30px, 3vw, 44px); margin-top: 6px;
+      }
+      .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: stretch; }
+      .step, .pane, .node, .seat {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.025);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .step i, .seat .who, .node span, .exit span {
+        font-style: normal; font-family: var(--mono); color: var(--green); font-size: 12px; letter-spacing: 0.12em;
+      }
+      .step h2, .seat h2, .node b, .exit b { font-size: 26px; letter-spacing: -0.04em; font-weight: 600; }
+      .step p, .seat p, .pane p, .node em, .exit em { color: var(--muted); line-height: 1.4; font-style: normal; }
+      .step .chip { margin-top: auto; font-family: var(--mono); font-size: 12px; color: var(--green); }
+
+      .round { grid-template-rows: auto auto 1fr; gap: 14px; align-content: center; }
+      .pipes { display: grid; grid-template-columns: minmax(0, 0.9fr) 28px minmax(0, 1fr) 28px minmax(0, 0.95fr); align-items: center; }
+      .node { min-height: 128px; }
+      .node.hold { border-color: rgba(20, 241, 149, 0.5); background: rgba(20, 241, 149, 0.07); }
+      .node.hold b { color: var(--green); }
+      .arrow { text-align: center; color: var(--green); font-family: var(--mono); }
+      .exits { display: grid; gap: 8px; }
+      .exit { border-radius: 14px; padding: 12px 14px; border: 1px solid var(--line); }
+      .exit.hit { border-color: rgba(20, 241, 149, 0.45); }
+      .exit.miss { border-color: rgba(153, 69, 255, 0.45); }
+      .instr { display: flex; gap: 8px; flex-wrap: wrap; }
+      .instr span { font-family: var(--mono); font-size: 12px; padding: 6px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+
+      .proof { grid-template-columns: 0.95fr 1.05fr; grid-template-rows: auto 1fr; column-gap: 28px; }
+      .proof header { grid-column: 1; }
+      .proof .lede { margin-top: 10px; }
+      .cert {
+        grid-column: 2; grid-row: 1 / span 2; align-self: center;
+        border-radius: 22px; padding: 18px 18px 14px;
+        border: 1px solid rgba(20, 241, 149, 0.28);
+        background:
+          radial-gradient(320px 140px at 100% 0%, rgba(20, 241, 149, 0.1), transparent 50%),
+          var(--panel);
+      }
+      .cert h2 { font-size: 28px; letter-spacing: -0.04em; margin: 4px 0; }
+      .kv { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; }
+      .kv span { color: var(--muted); }
+      .hash { font-family: var(--mono); font-size: 12px; }
+      .validators { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+      .validators span { border: 1px solid rgba(20, 241, 149, 0.35); color: var(--green); border-radius: 999px; padding: 5px 8px; font-size: 12px; }
+      .fine { margin-top: 14px; color: var(--faint); font-size: 13px; line-height: 1.4; max-width: 46ch; }
+
+      .seats { grid-template-columns: 1fr 1fr; gap: 14px; align-content: center; }
+      .seats header { grid-column: 1 / -1; }
+      .seat { min-height: 250px; }
+      .seat.provider { background: rgba(20, 241, 149, 0.05); border-color: rgba(20, 241, 149, 0.28); }
+      .seat ul { margin-top: auto; padding: 0; list-style: none; display: grid; gap: 8px; }
+      .seat li { padding-top: 8px; border-top: 1px solid var(--line); }
+
+      .solana, .fee, .now { grid-template-columns: 1fr 0.95fr; column-gap: 28px; align-items: center; }
+      .solana header, .fee header, .now header { grid-column: 1; }
+      .spec, .timeline { display: grid; }
+      .spec div, .timeline li { padding: 11px 0; border-top: 1px solid var(--line); align-items: baseline; }
+      .spec dd { max-width: 28ch; }
+      .timeline { padding: 0; margin: 0; list-style: none; }
+      .timeline li { display: grid; grid-template-columns: 78px 1fr; gap: 12px; }
+      .timeline span { font-family: var(--mono); font-size: 12px; color: var(--green); letter-spacing: 0.08em; }
+      .timeline b { display: block; }
+      .timeline p { color: var(--muted); font-size: 14px; line-height: 1.35; margin-top: 2px; }
+      .close-line { margin-top: 16px; font-size: clamp(22px, 2.1vw, 30px); letter-spacing: -0.045em; line-height: 1.05; font-weight: 600; }
+
+      .ledger { border-radius: 20px; border: 1px solid var(--line); padding: 16px 16px 8px; background: var(--panel); }
+      .ledger h2 { letter-spacing: -0.04em; font-size: 20px; margin-bottom: 8px; font-weight: 600; }
+      .ledger div { padding: 9px 0; border-top: 1px solid var(--line); }
+      .ledger .pay dd { color: var(--green); font-size: 20px; font-weight: 600; }
+      .note { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+
+      .market { align-content: end; padding-bottom: 18px; }
+      .market .figure { font-weight: 650; font-size: clamp(84px, 10vw, 132px); letter-spacing: -0.06em; line-height: 0.84; }
+      .market h1 { max-width: 22ch; margin: 12px 0 16px; }
+      .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .facts article { border-top: 1px solid var(--line); padding-top: 10px; }
+      .facts b { display: block; font-size: 26px; letter-spacing: -0.04em; font-weight: 600; }
+      .facts p { color: var(--muted); font-size: 14px; line-height: 1.35; margin-top: 4px; }
+      .source { margin-top: 12px; font-family: var(--mono); font-size: 11px; color: var(--faint); line-height: 1.45; max-width: 95ch; }
+      .demo-link {
+        display: inline-flex; margin-top: 14px; padding: 8px 12px; border-radius: 999px;
+        background: var(--green); color: var(--green-ink); font-weight: 650; text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewport">
+      <div class="frame">
+        <header class="top">
+          <div class="brand">
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <rect x="3" y="3" width="16" height="16" rx="4" fill="#9945FF" />
+              <rect x="13" y="13" width="16" height="16" rx="4" fill="#14F195" />
+            </svg>
+            Cortex<em>DePIN</em>
+          </div>
+          <p class="pill">Pitch · simulated protocol</p>
+          <p class="idx" id="count">01 / 12</p>
+        </header>
+
+        <div class="slides">
+          <section class="slide cover on" data-name="Open">
+            <div>
+              <p class="kicker">GPU marketplace · Solana</p>
+              <h1>The escrow locks.<br />The proof releases it.</h1>
+              <p class="lede">Providers list GPUs. Requesters lock SOL for inference or training. Micropayments move only for slices a quorum says actually ran.</p>
+            </div>
+            <aside class="receipt">
+              <div class="seal">Verified</div>
+              <p class="kicker">Cortex attestation</p>
+              <h2>Helios Forge</h2>
+              <p class="job">Inference · Llama 3.1 8B · H100</p>
+              <strong>$2.17<small>released</small></strong>
+              <dl>
+                <div><dt>Escrow locked</dt><dd>$3.36</dd></div>
+                <div><dt>Buffer refunded</dt><dd>$1.19</dd></div>
+                <div><dt>Quorum</dt><dd>3 / 3</dd></div>
+                <div><dt>Settlement</dt><dd>0.0146 SOL</dd></div>
+              </dl>
+            </aside>
+          </section>
+
+          <section class="slide gap" data-name="The bill">
+            <p class="kicker">The bill</p>
+            <h1>Renting a GPU still does not prove the work.</h1>
+            <p class="lede">The buyer needs capacity, a price, and a reason to believe this input produced this output. Cloud sells the machine. The proof is still a log from the party that got paid.</p>
+          </section>
+
+          <section class="slide breaks" data-name="What breaks">
+            <p class="kicker">What breaks</p>
+            <h1>Three ways the payment comes loose from the job.</h1>
+            <ol>
+              <li>
+                <span>01</span>
+                <div>
+                  <b>The hour is the wrong unit.</b>
+                  <p>Reserved capacity bills the window, including minutes the model was not running. A short inference job still pays for the reservation around it.</p>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <b>A listing is not a result.</b>
+                  <p>Spot GPUs are easy to post. Nothing in the payment checks the model, the input hash, or the output hash against the card that was advertised.</p>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  <b>Online is not the same as useful.</b>
+                  <p>A network that rewards uptime pays for a heartbeat. The requester paid for tokens, or for a training step that moved the loss.</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <section class="slide thesis" data-name="Thesis">
+            <p class="kicker">Thesis</p>
+            <h1>Settle the slice. Return the rest.</h1>
+            <div class="rule"></div>
+            <p>One signature locks escrow. Each attested slice releases a micropayment. Unused buffer goes back to the requester when the job closes.</p>
+          </section>
+
+          <section class="slide how" data-name="The loop">
+            <header>
+              <p class="kicker">The loop</p>
+              <h1>Three moves. One signature from the requester.</h1>
+            </header>
+            <div class="steps">
+              <article class="step">
+                <i>01 · POST</i>
+                <h2>List the GPU.</h2>
+                <p>A provider posts the card, the region, and an hourly rate. The book can be inference, fine-tune, or training.</p>
+                <span class="chip">H100 · Frankfurt · $6.20/hr</span>
+              </article>
+              <article class="step">
+                <i>02 · LOCK</i>
+                <h2>Escrow the job.</h2>
+                <p>The requester signs once. The quote plus a buffer leaves the wallet before the first token.</p>
+                <span class="chip">lock_escrow · one transaction</span>
+              </article>
+              <article class="step">
+                <i>03 · ATTEST</i>
+                <h2>Pay the slice.</h2>
+                <p>A quorum signs the output. That slice pays the provider. A slice that fails does not.</p>
+                <span class="chip">release · then refund</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="slide round" data-name="The slice">
+            <header>
+              <p class="kicker">One job</p>
+              <h1>The money sits in the program, not in a promise.</h1>
+            </header>
+            <div class="pipes">
+              <article class="node">
+                <span>Requester</span>
+                <b>Signs once</b>
+                <em>Then watches the stream. No second signature to release or refund.</em>
+              </article>
+              <div class="arrow">→</div>
+              <article class="node hold">
+                <span>Escrow</span>
+                <b>$3.36</b>
+                <em>Quote $2.17 is releasable. The buffer waits for the close.</em>
+              </article>
+              <div class="arrow">→</div>
+              <div class="exits">
+                <article class="exit hit">
+                  <span>Attested</span>
+                  <b>$2.17</b>
+                  <em>Paid to the provider.</em>
+                </article>
+                <article class="exit miss">
+                  <span>Unused</span>
+                  <b>$1.19</b>
+                  <em>Refunded to the requester.</em>
+                </article>
+              </div>
+            </div>
+            <div class="instr">
+              <span>lock_escrow</span>
+              <span>attest_slice</span>
+              <span>release</span>
+              <span>refund</span>
+            </div>
+          </section>
+
+          <section class="slide proof" data-name="The proof">
+            <header>
+              <p class="kicker">The proof</p>
+              <h1>No signature, no release.</h1>
+              <p class="lede">The payment rule is the product. A slice leaves escrow only after the input, the output, and the advertised GPU are committed together.</p>
+              <p class="fine">In this demo the quorum is simulated. The rule is not: a failed check does not pay.</p>
+            </header>
+            <article class="cert">
+              <p class="kicker">Cortex attestation</p>
+              <h2>cx_a523</h2>
+              <p class="job" style="color: var(--muted); margin-bottom: 8px;">Inference · Helios Forge · H100</p>
+              <div class="kv"><span>Input hash</span><b class="hash">c95b90d0…3a39</b></div>
+              <div class="kv"><span>Output hash</span><b class="hash">61ba6ffb…b7c1</b></div>
+              <div class="kv"><span>GPU</span><b>NVIDIA H100 80GB</b></div>
+              <div class="kv"><span>Paid</span><b>$2.17 · 0.0146 SOL</b></div>
+              <div class="kv"><span>Refunded</span><b>$1.19</b></div>
+              <div class="validators">
+                <span>Lattice Guard</span>
+                <span>SolProof</span>
+                <span>North Quorum</span>
+              </div>
+            </article>
+          </section>
+
+          <section class="slide seats" data-name="Two seats">
+            <header>
+              <p class="kicker">Same job, two seats</p>
+              <h1>The requester funds it. The provider earns it.</h1>
+            </header>
+            <article class="seat">
+              <p class="who">Requester</p>
+              <h2>Lock, then read.</h2>
+              <p>They pick a GPU, a model, and a prompt or a training note. After the signature they do not manage the machine.</p>
+              <ul>
+                <li>Balance drops when escrow locks, not when the hour ends.</li>
+                <li>The buffer returns if the window is not used.</li>
+              </ul>
+            </article>
+            <article class="seat provider">
+              <p class="who">Provider</p>
+              <h2>Post, then get paid.</h2>
+              <p>They list hardware at an hourly rate. Earnings show up only when a job on that node is attested and the escrow settles.</p>
+              <ul>
+                <li>A busy node is not bookable.</li>
+                <li>A heartbeat alone does not settle.</li>
+              </ul>
+            </article>
+          </section>
+
+          <section class="slide solana" data-name="Solana">
+            <header>
+              <p class="kicker">Why this network</p>
+              <h1>A slice has to be cheap enough to be a payment.</h1>
+              <p class="lede">The job is a burst, not a monthly invoice. Settlement has to finish inside it, and the requester should not sign again to get the refund.</p>
+            </header>
+            <div class="spec">
+              <div><dt>Asset</dt><dd>SOL escrow</dd></div>
+              <div><dt>Unit</dt><dd>One attested slice</dd></div>
+              <div><dt>Signatures</dt><dd>One, to lock</dd></div>
+              <div><dt>Release</dt><dd>The program, after quorum</dd></div>
+              <div><dt>Today</dt><dd>Simulated devnet. Nothing is broadcast.</dd></div>
+            </div>
+          </section>
+
+          <section class="slide fee" data-name="The fee">
+            <header>
+              <p class="kicker">Proposed model · the demo takes 0%</p>
+              <h1>Earn only when a slice is paid.</h1>
+              <p class="lede">A fee on the refund makes an unused buffer feel like a tax. Take it, if at all, from the attested release. Send the rest back whole.</p>
+            </header>
+            <aside class="ledger">
+              <h2>The job in the demo</h2>
+              <div><dt>Escrow locked</dt><dd>$3.36</dd></div>
+              <div><dt>Released to provider</dt><dd>$2.17</dd></div>
+              <div><dt>Refunded</dt><dd>$1.19</dd></div>
+              <div class="pay"><dt>Protocol fee</dt><dd>$0.00</dd></div>
+              <p class="note">This is the recording, on purpose. A take rate is a later parameter on the release, not a charge on the refund.</p>
+            </aside>
+          </section>
+
+          <section class="slide market" data-name="The spend">
+            <p class="kicker">The spend next to the product · not revenue</p>
+            <p class="figure">$42.3B</p>
+            <h1>AI-optimized IaaS in 2026. Inference is now the larger half.</h1>
+            <div class="facts">
+              <article>
+                <b>$23.3B</b>
+                <p>Inference spending in 2026, ahead of training for the first time in this forecast.</p>
+              </article>
+              <article>
+                <b>$19.0B</b>
+                <p>Training spending in the same year. The burst job and the long job are both in the book.</p>
+              </article>
+              <article>
+                <b>55%</b>
+                <p>Share of AI-optimized IaaS spend that supports inference in 2026. Gartner puts it at 59% in 2027.</p>
+              </article>
+            </div>
+            <p class="source">Source: Gartner press release, August 10, 2026. End-user spending on AI-optimized IaaS. The table figure is $42.276 billion. Not CortexDePIN revenue, users, or GPUs online.</p>
+          </section>
+
+          <section class="slide now" data-name="Status">
+            <header>
+              <p class="kicker">Honest status</p>
+              <h1>The loop runs. The chain does not, yet.</h1>
+              <p class="close-line">The escrow locks. The proof releases it.</p>
+              <a class="demo-link" href="/">Open the demo</a>
+            </header>
+            <ol class="timeline">
+              <li>
+                <span>NOW</span>
+                <div>
+                  <b>Browser demo</b>
+                  <p>Marketplace, wallet, escrow, streaming payment, attestation. The counters on screen are set dressing.</p>
+                </div>
+              </li>
+              <li>
+                <span>NEXT</span>
+                <div>
+                  <b>Program on devnet</b>
+                  <p>A real wallet signs the lock. The escrow account is no longer a mock.</p>
+                </div>
+              </li>
+              <li>
+                <span>THEN</span>
+                <div>
+                  <b>A real attestation</b>
+                  <p>Replace the simulated quorum with recompute, a TEE, or a named referee.</p>
+                </div>
+              </li>
+              <li>
+                <span>LATER</span>
+                <div>
+                  <b>Supply that is not us</b>
+                  <p>Operators list cards. The book clears without the team sitting on both seats.</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+        </div>
+
+        <footer class="bottom">
+          <p class="slide-name" id="name">Open</p>
+          <div class="controls">
+            <button type="button" id="prev" aria-label="Previous slide">←</button>
+            <button type="button" id="next" aria-label="Next slide">→</button>
+          </div>
+        </footer>
+        <div class="track" id="track"></div>
+      </div>
+    </div>
+    <script>
+      const slides = [...document.querySelectorAll(".slide")]
+      const track = document.querySelector("#track")
+      const count = document.querySelector("#count")
+      const name = document.querySelector("#name")
+      let index = 0
+
+      slides.forEach((_, i) => {
+        const dot = document.createElement("button")
+        dot.type = "button"
+        dot.setAttribute("aria-label", "Go to slide " + (i + 1))
+        dot.addEventListener("click", () => show(i))
+        track.append(dot)
+      })
+
+      function show(next) {
+        index = (next + slides.length) % slides.length
+        slides.forEach((slide, i) => slide.classList.toggle("on", i === index))
+        ;[...track.children].forEach((dot, i) => dot.classList.toggle("on", i === index))
+        count.textContent = String(index + 1).padStart(2, "0") + " / " + String(slides.length).padStart(2, "0")
+        name.textContent = slides[index].dataset.name || ""
+        history.replaceState(null, "", "#" + (index + 1))
+      }
+
+      document.querySelector("#next").addEventListener("click", () => show(index + 1))
+      document.querySelector("#prev").addEventListener("click", () => show(index - 1))
+      window.addEventListener("keydown", (event) => {
+        if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return
+        if (event.key === "ArrowRight" || event.key === " " || event.key === "PageDown") {
+          event.preventDefault()
+          show(index + 1)
+        } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+          event.preventDefault()
+          show(index - 1)
+        } else if (event.key === "Home") show(0)
+        else if (event.key === "End") show(slides.length - 1)
+      })
+
+      const start = Number(location.hash.slice(1))
+      show(Number.isFinite(start) && start >= 1 ? start - 1 : 0)
+    </script>
+  </body>
+</html>
